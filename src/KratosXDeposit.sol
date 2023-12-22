@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
@@ -10,7 +11,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
  * @author  PRC
  * @title   Kratos-X Deposit Certificate NFT Smart Contract
  */
-contract KratosXDeposit is ERC721, ERC721URIStorage, AccessControl {
+contract KratosXDeposit is ERC721, ERC721Enumerable, ERC721URIStorage, AccessControl {
     error InvalidAddress();
     error SoulBoundToken();
 
@@ -72,13 +73,20 @@ contract KratosXDeposit is ERC721, ERC721URIStorage, AccessControl {
 
     // Soulbound token
 
-    function _update(address to, uint256 tokenId, address auth) internal override returns (address) {
+    function _update(address to, uint256 tokenId, address auth) internal override(ERC721, ERC721Enumerable) returns (address) {
         if (auth != address(0) && to != address(0)) revert SoulBoundToken();
         return super._update(to, tokenId, auth);
     }
 
     // Required overrides
 
+    function _increaseBalance(address account, uint128 value)
+        internal
+        override(ERC721, ERC721Enumerable)
+    {
+        super._increaseBalance(account, value);
+    }
+    
     function tokenURI(uint256 tokenId)
         public
         view
@@ -91,7 +99,7 @@ contract KratosXDeposit is ERC721, ERC721URIStorage, AccessControl {
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(ERC721, ERC721URIStorage, AccessControl)
+        override(ERC721, ERC721Enumerable, ERC721URIStorage, AccessControl)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
