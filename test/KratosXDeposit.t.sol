@@ -34,7 +34,7 @@ contract AteayaWhitelistTest is Test {
 
     function test_MintDeposit() public {
         vm.prank(operator);
-        deposit.safeMint(user, "", KratosXDeposit.Deposit(5000, uint32(block.timestamp), true));
+        deposit.mint(user, "", KratosXDeposit.Deposit(5000, uint32(block.timestamp), true));
         assertEq(deposit.balanceOf(user), 1, "user has no token");
         (uint256 nominal, uint32 timestamp, bool hasBonus) = deposit.depositData(0);
         assertEq(nominal, 5000, "wrong nominal value");
@@ -44,17 +44,17 @@ contract AteayaWhitelistTest is Test {
 
     function testFail_AdminCannotMint() public {
         vm.prank(admin);
-        deposit.safeMint(user, "", KratosXDeposit.Deposit(5000, uint32(block.timestamp), true));
+        deposit.mint(user, "", KratosXDeposit.Deposit(5000, uint32(block.timestamp), true));
     }
 
     function testFail_RegularUserCannotMint() public {
         vm.prank(user);
-        deposit.safeMint(user, "", KratosXDeposit.Deposit(5000, uint32(block.timestamp), true));
+        deposit.mint(user, "", KratosXDeposit.Deposit(5000, uint32(block.timestamp), true));
     }
 
     function test_BurnDeposit() public {
         vm.startPrank(operator);
-        deposit.safeMint(user, "", KratosXDeposit.Deposit(5000, uint32(block.timestamp), true));
+        deposit.mint(user, "", KratosXDeposit.Deposit(5000, uint32(block.timestamp), true));
         deposit.burn(0);
         vm.stopPrank();
         assertEq(deposit.balanceOf(user), 0, "user still has a token");
@@ -66,14 +66,14 @@ contract AteayaWhitelistTest is Test {
 
     function testFail_AdminCannotBurn() public {
         vm.prank(operator);
-        deposit.safeMint(user, "", KratosXDeposit.Deposit(5000, uint32(block.timestamp), true));
+        deposit.mint(user, "", KratosXDeposit.Deposit(5000, uint32(block.timestamp), true));
         vm.prank(admin);
         deposit.burn(0);
     }
 
     function testFail_RegularUserCannotBurn() public {
         vm.prank(operator);
-        deposit.safeMint(user, "", KratosXDeposit.Deposit(5000, uint32(block.timestamp), true));
+        deposit.mint(user, "", KratosXDeposit.Deposit(5000, uint32(block.timestamp), true));
         vm.prank(user);
         deposit.burn(0);
     }
