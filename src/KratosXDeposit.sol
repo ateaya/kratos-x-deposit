@@ -53,9 +53,10 @@ contract KratosXDeposit is ERC721, ERC721Enumerable, ERC721URIStorage, AccessCon
      * @param   to      The address of the depositer (soul bound)
      * @param   uri     The uri of the deposit metadata (for UI)
      * @param   data    The deposit internal data
+     * @return  tokenId The token id minted
      */
-    function mint(address to, string calldata uri, Deposit calldata data) external onlyRole(OPERATOR_ROLE) {
-        uint256 tokenId = nextTokenId++;
+    function mint(address to, string calldata uri, Deposit calldata data) external onlyRole(OPERATOR_ROLE) returns (uint256 tokenId) {
+        tokenId = nextTokenId++;
         _safeMint(to, tokenId);
         depositData[tokenId] = data;
         _setTokenURI(tokenId, uri);
