@@ -7,6 +7,9 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
+import {DepositData} from "./IKratosXDeposit.sol";
+
+
 /**
  * @author  PRC
  * @title   Kratos-X Deposit Certificate NFT Smart Contract
@@ -22,13 +25,7 @@ contract KratosXDeposit is ERC721, ERC721Enumerable, ERC721URIStorage, AccessCon
 
     IERC20 public immutable underlyingToken;    // the underlying token used for this contract
 
-    struct Deposit {
-        uint256 nominal;        // nominal value of the deposit (based on token)
-        uint32  timestamp;      // timestamp when the deposit was created
-        bool    hasBonus;       // bonus flag for the vault accounting
-    }
-
-    mapping (uint256 tokenId => Deposit) public depositData;
+    mapping (uint256 tokenId => DepositData) public depositData;
 
     /**
      * @notice  Constructor
@@ -51,15 +48,14 @@ contract KratosXDeposit is ERC721, ERC721Enumerable, ERC721URIStorage, AccessCon
      * @notice  This function mints a new deposit cerificate
      * @dev     Call this function to mint a new deposit certificate
      * @param   to      The address of the depositer (soul bound)
-     * @param   uri     The uri of the deposit metadata (for UI)
      * @param   data    The deposit internal data
      * @return  tokenId The token id minted
      */
-    function mint(address to, string calldata uri, Deposit calldata data) external onlyRole(OPERATOR_ROLE) returns (uint256 tokenId) {
+    function mint(address to, DepositData calldata data) external onlyRole(OPERATOR_ROLE) returns (uint256 tokenId) {
         tokenId = nextTokenId++;
         _safeMint(to, tokenId);
         depositData[tokenId] = data;
-        _setTokenURI(tokenId, uri);
+        _setTokenURI(tokenId, generateUri(tokenId, to, data));
     }
 
     /**
@@ -70,6 +66,11 @@ contract KratosXDeposit is ERC721, ERC721Enumerable, ERC721URIStorage, AccessCon
     function burn(uint256 tokenId) external onlyRole(OPERATOR_ROLE) {
         delete depositData[tokenId];
         _burn(tokenId);
+    }
+
+    function generateUri(uint256 tokenId, address owner, DepositData calldata data) internal pure returns (string memory) {
+        // TODO: return the correct uri from backend
+        return "";
     }
 
     // Soulbound token
